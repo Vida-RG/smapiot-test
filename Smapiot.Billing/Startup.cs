@@ -30,6 +30,7 @@ namespace Smapiot.Billing
 
             services.Configure<RequestCounterApiKey>(Configuration);
             services.AddHttpClient<RequestCounterClient>();
+            services.AddTransient<IRequestCounterService, RequestCounterService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

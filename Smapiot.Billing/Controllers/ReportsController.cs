@@ -8,16 +8,23 @@ namespace Smapiot.Billing.Controllers
     [ApiController]
     public class ReportsController : ControllerBase
     {
-        private readonly RequestCounterClient _requestCounterClient;
+        private readonly IRequestCounterService _requestCounterClient;
 
-        public ReportsController(RequestCounterClient requestCounterClient)
+        public ReportsController(IRequestCounterService requestCounterClient)
         {
             _requestCounterClient = requestCounterClient;
         }
 
-        // GET api/values/5
-        [HttpGet("{id}")]
-        public async Task<IActionResult> Get(int id)
+        [HttpGet("{subscriptionId}")]
+        public async Task<IActionResult> Get(string subscriptionId)
+        {
+            var request = await _requestCounterClient._api_requests_year_month_getAsync(2019, 3);
+
+            return Ok();
+        }
+
+        [HttpGet("{subscriptionId}/{year}/{month}")]
+        public async Task<IActionResult> GetSpecific(string subscriptionId)
         {
             var request = await _requestCounterClient._api_requests_year_month_getAsync(2019, 3);
 
