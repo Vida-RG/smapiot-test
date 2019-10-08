@@ -5,6 +5,8 @@ VisualStudioVersion = 15.0.28307.852
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Smapiot.RequestCounter", "Smapiot.RequestCounter\Smapiot.RequestCounter.csproj", "{CCAB9C7D-1AC2-4B74-9E68-6908D2427AFB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Smapiot.Billing", "Smapiot.Billing\Smapiot.Billing.csproj", "{56BFBAB1-9E28-4B96-B852-826F2B9FC236}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -15,6 +17,10 @@ Global
 		{CCAB9C7D-1AC2-4B74-9E68-6908D2427AFB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CCAB9C7D-1AC2-4B74-9E68-6908D2427AFB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CCAB9C7D-1AC2-4B74-9E68-6908D2427AFB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{56BFBAB1-9E28-4B96-B852-826F2B9FC236}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{56BFBAB1-9E28-4B96-B852-826F2B9FC236}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{56BFBAB1-9E28-4B96-B852-826F2B9FC236}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{56BFBAB1-9E28-4B96-B852-826F2B9FC236}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

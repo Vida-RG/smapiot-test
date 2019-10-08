@@ -5,3 +5,5 @@
 /.vs
 /Smapiot.RequestCounter/obj
 /Smapiot.RequestCounter/bin/Debug/netcoreapp2.1
+/Smapiot.Billing/obj
+/Smapiot.Billing/bin/Debug/netcoreapp2.1
