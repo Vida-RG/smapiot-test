@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Smapiot.Billing.Domain.Services;
 using Smapiot.RequestCounter;
 
 namespace Smapiot.Billing
@@ -31,6 +32,8 @@ namespace Smapiot.Billing
             services.Configure<RequestCounterApiKey>(Configuration);
             services.AddHttpClient<RequestCounterClient>();
             services.AddTransient<IRequestCounterService, RequestCounterService>();
+
+            services.AddTransient<IReportCalculatorService, ReportCalculatorService>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -7,3 +7,7 @@
 /Smapiot.RequestCounter/bin/Debug/netcoreapp2.1
 /Smapiot.Billing/obj
 /Smapiot.Billing/bin/Debug/netcoreapp2.1
+/Smapiot.Billing.Domain/bin/Debug/netcoreapp2.1
+/Smapiot.Billing.Domain/obj
+/SmapiotBillingDomain.UnitTest/bin/Debug/netcoreapp2.1
+/SmapiotBillingDomain.UnitTest/obj

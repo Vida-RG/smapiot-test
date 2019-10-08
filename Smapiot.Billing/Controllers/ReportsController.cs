@@ -1,5 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using Smapiot.Billing.Domain.Models;
+using Smapiot.Billing.Domain.Services;
 using Smapiot.RequestCounter;
+using System;
 using System.Threading.Tasks;
 
 namespace Smapiot.Billing.Controllers
@@ -8,27 +11,50 @@ namespace Smapiot.Billing.Controllers
     [ApiController]
     public class ReportsController : ControllerBase
     {
-        private readonly IRequestCounterService _requestCounterClient;
+        private readonly IReportCalculatorService _requestCounterService;
 
-        public ReportsController(IRequestCounterService requestCounterClient)
+        public ReportsController(IReportCalculatorService requestCounterService)
         {
-            _requestCounterClient = requestCounterClient;
+            _requestCounterService = requestCounterService;
         }
 
-        [HttpGet("{subscriptionId}")]
+        [HttpGet("{subscriptionId:guid}")]
         public async Task<IActionResult> Get(string subscriptionId)
         {
-            var request = await _requestCounterClient._api_requests_year_month_getAsync(2019, 3);
-
-            return Ok();
+            return await GetReportInResult(subscriptionId, DateTime.Now.Year, DateTime.Now.Month);
         }
 
-        [HttpGet("{subscriptionId}/{year}/{month}")]
-        public async Task<IActionResult> GetSpecific(string subscriptionId)
+        [HttpGet("{subscriptionId:guid}/{year:int}/{month:int}")]
+        public async Task<IActionResult> GetSpecific(string subscriptionId, int year, int month)
         {
-            var request = await _requestCounterClient._api_requests_year_month_getAsync(2019, 3);
+            return await GetReportInResult(subscriptionId, year, month);
+        }
 
-            return Ok();
+        private async Task<IActionResult> GetReportInResult(string subscriptionId, int year, int month)
+        {
+            MonthlyReport report = null;
+            try
+            {
+                report = await _requestCounterService.CalculateReport(subscriptionId, DateTime.Now.Year, DateTime.Now.Month);
+            }
+            catch (ApiException<Error> error)
+            {
+                if (error.StatusCode == 400)
+                {
+                    return BadRequest(error.Message);
+                }
+
+                if (error.StatusCode == 404)
+                {
+                    return NotFound(error.Message);
+                }
+            }
+            catch (ApiException)
+            {
+                throw new ApplicationException("Unexpected error orrured, please contact an administrator of the service");
+            }
+
+            return Ok(report);
         }
     }
 }

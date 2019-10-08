@@ -17,6 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Smapiot.Billing.Domain\Smapiot.Billing.Domain.csproj" />
     <ProjectReference Include="..\Smapiot.RequestCounter\Smapiot.RequestCounter.csproj" />
   </ItemGroup>
 
