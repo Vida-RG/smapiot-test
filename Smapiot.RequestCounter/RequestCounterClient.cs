@@ -9,6 +9,7 @@ namespace Smapiot.RequestCounter
         public RequestCounterClient(
             System.Net.Http.HttpClient httpClient,
             IOptionsMonitor<RequestCounterApiKey> optionsMonitor)
+            : this(httpClient)
         {
             _apiKey = optionsMonitor.CurrentValue.ApiKeyRequestCounter;
         }
