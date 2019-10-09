@@ -35,7 +35,7 @@ namespace Smapiot.Billing.Controllers
             MonthlyReport report = null;
             try
             {
-                report = await _requestCounterService.CalculateReport(subscriptionId, DateTime.Now.Year, DateTime.Now.Month);
+                report = await _requestCounterService.CalculateReport(subscriptionId, year, month);
             }
             catch (ApiException<Error> error)
             {
