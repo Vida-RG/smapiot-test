@@ -37,10 +37,10 @@ namespace Smapiot.Billing.Domain.Services
                     CalculateCostPerServices(requestsForSubscription)
                     .ToArray();
 
-                IEnumerable<CostPerService> estimatesForTheRestOfTheMonth = null;
+                IEnumerable<CostPerService> estimatesForMonth = null;
                 if (DateTime.Now.Year == year && DateTime.Now.Month == month)
                 {
-                    estimatesForTheRestOfTheMonth =
+                    estimatesForMonth =
                         calculatedCosts
                             .Select(costPerService =>
                             {
@@ -51,7 +51,7 @@ namespace Smapiot.Billing.Domain.Services
                                 {
                                     ServiceName = costPerService.ServiceName,
                                     NumberOfRequests = (int)Math.Ceiling(costPerService.NumberOfRequests * multiplier),
-                                    TotalPrice = (int)Math.Ceiling(costPerService.TotalPrice * (decimal)multiplier)
+                                    TotalPrice = Math.Ceiling(costPerService.TotalPrice * (decimal)multiplier)
                                 };
                             })
                             .ToArray();
@@ -67,7 +67,7 @@ namespace Smapiot.Billing.Domain.Services
                         StartDate =startDate,
                         EndDate = LastDateOfMonth(startDate),
                         Costs = calculatedCosts,
-                        EstimatedForRemaining = estimatesForTheRestOfTheMonth
+                        EstimatesForMonth = estimatesForMonth
                     };
             }
 
@@ -128,9 +128,9 @@ namespace Smapiot.Billing.Domain.Services
             }
 
             DateTime lastDate = datum.Max();
-            DateTime lastDayfMonth = LastDateOfMonth(lastDate);
+            DateTime lastDateOfMonth = LastDateOfMonth(lastDate);
 
-            return lastDayfMonth.Day / (double)lastDate.Day;
+            return lastDateOfMonth.Day / (double)lastDate.Day;
         }
 
         public DateTime LastDateOfMonth(DateTime date)
@@ -140,6 +140,5 @@ namespace Smapiot.Billing.Domain.Services
                 date.Month,
                 DateTime.DaysInMonth(date.Year, date.Month));
         }
-
     }
 }

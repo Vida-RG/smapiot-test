@@ -226,7 +226,7 @@ namespace SmapiotBillingDomain.UnitTest
             Assert.IsTrue(result.StartDate.CompareTo(new DateTime(1, 1, 1)) == 0);
             Assert.IsTrue(result.EndDate.CompareTo(new DateTime(1, 1, 31)) == 0);
             Assert.AreNotEqual(result.Costs, null);
-            Assert.AreEqual(result.EstimatedForRemaining, null);
+            Assert.AreEqual(result.EstimatesForMonth, null);
         }
 
         [TestMethod]
@@ -255,7 +255,7 @@ namespace SmapiotBillingDomain.UnitTest
 
             MonthlyReport result = service.CalculateReport(specificId, DateTime.Now.Year, DateTime.Now.Month).Result;
 
-            Assert.AreNotEqual(result.EstimatedForRemaining, null);
+            Assert.AreNotEqual(result.EstimatesForMonth, null);
         }
 
         [TestMethod]
