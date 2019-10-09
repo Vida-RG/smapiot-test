@@ -33,9 +33,23 @@ namespace Smapiot.Billing.Domain.Services
             MonthlyReport result = null;
             if (requestsForSubscription.Any())
             {
+                var calculatedCosts = CalculateCostPerServices(requestsForSubscription);
+
+
+
                 result =
                     new MonthlyReport()
                     {
+                        TotalNumberOfRequests = requestsForSubscription.Count(),
+                        SubscriptionId = requestsForSubscription.First().SubscriptionId,
+                        StartDate = new DateTime(year, month, 1),
+                        EndDate =
+                            new DateTime(
+                                year,
+                                month,
+                                DateTime.DaysInMonth(year, month)),
+                        Costs = calculatedCosts,
+                        EstimatedForRemaining = null
                     };
             }
 
@@ -50,7 +64,7 @@ namespace Smapiot.Billing.Domain.Services
             }
 
             return allRequests.Requests1
-                .Where(request => request.Id == subscriptionId)
+                .Where(request => request.SubscriptionId == subscriptionId)
                 .ToArray();
         }
 
@@ -60,7 +74,7 @@ namespace Smapiot.Billing.Domain.Services
                 requests
                     .GroupBy(request => request.ServiceName);
 
-            return null;
+            return new List<CostPerService>();
         }
     }
 }

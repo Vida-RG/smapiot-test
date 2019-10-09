@@ -39,12 +39,35 @@ namespace SmapiotBillingDomain.UnitTest
                 {
                     Requests1 = new List<Request>()
                         {
-                            new Request() { Id = Guid.Empty.ToString() },
-                            new Request() { Id = specificId }
+                            new Request() { SubscriptionId = Guid.Empty.ToString() },
+                            new Request() { SubscriptionId = specificId }
                         }
                 });
 
             Assert.AreEqual(result.Count(), 1);
+        }
+
+        [TestMethod]
+        public void RequestsOfSubscription_ForSpecificId_GetOneWithSubscriptionId()
+        {
+            const string specificId = "BBCED7DB-6972-46D4-B6CF-D2C733E4B23D";
+
+            var reportServiceMock = new Mock<IRequestCounterService>();
+
+            var service = new ReportCalculatorService(reportServiceMock.Object);
+
+            var result = service.RequestsOfSubscription(
+                specificId,
+                new Requests()
+                {
+                    Requests1 = new List<Request>()
+                        {
+                            new Request() { SubscriptionId = Guid.Empty.ToString() },
+                            new Request() { SubscriptionId = specificId }
+                        }
+                });
+
+            Assert.AreEqual(result.First().SubscriptionId, specificId);
         }
 
         [TestMethod]
@@ -106,16 +129,47 @@ namespace SmapiotBillingDomain.UnitTest
                         new Requests()
                         {
                             Requests1 = new List<Request>()
+                            {
+                                new Request() { SubscriptionId = Guid.Empty.ToString() }
+                            }
+                        }));
+
+            var service = new ReportCalculatorService(reportServiceMock.Object);
+
+            MonthlyReport result = service.CalculateReport(Guid.Empty.ToString(), 1, 1).Result;
+
+            Assert.AreNotEqual(result, null);
+        }
+
+        [TestMethod]
+        public void CalculateReport_AtleastOneRequestFound_ReturnsAReportFilledIn()
+        {
+            const string specificId = "BBCED7DB-6972-46D4-B6CF-D2C733E4B23D";
+
+            var reportServiceMock = new Mock<IRequestCounterService>();
+            reportServiceMock
+                .Setup(moq =>
+                    moq._api_requests_year_month_getAsync(It.IsAny<int>(), It.IsAny<int>()))
+                .Returns(
+                    Task.FromResult<Requests>(
+                        new Requests()
                         {
-                            new Request() { Id = Guid.Empty.ToString() }
+                            Requests1 = new List<Request>()
+                        {
+                            new Request() { SubscriptionId = specificId }
                         }
                         }));
 
             var service = new ReportCalculatorService(reportServiceMock.Object);
 
-            MonthlyReport result = service.CalculateReport(Guid.Empty.ToString(), 0, 0).Result;
+            MonthlyReport result = service.CalculateReport(specificId, 1, 1).Result;
 
-            Assert.AreNotEqual(result, null);
+            Assert.IsTrue(result.TotalNumberOfRequests > 0);
+            Assert.AreEqual(result.SubscriptionId, specificId);
+            Assert.IsTrue(result.StartDate.CompareTo(new DateTime(1, 1, 1)) == 0);
+            Assert.IsTrue(result.EndDate.CompareTo(new DateTime(1, 1, 31)) == 0);
+            Assert.AreNotEqual(result.Costs, null);
+            Assert.AreEqual(result.EstimatedForRemaining, null);
         }
     }
 }
