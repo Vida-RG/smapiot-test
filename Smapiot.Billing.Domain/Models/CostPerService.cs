@@ -1,6 +1,9 @@
 ﻿namespace Smapiot.Billing.Domain.Models
 {
-    internal class CostPerService
+    public class CostPerService
     {
+        public string ServiceName { get; set; }
+        public decimal TotalPrice { get; set; }
+        public int NumberOfRequests { get; set; }
     }
 }
