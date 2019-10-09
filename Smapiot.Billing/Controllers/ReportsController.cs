@@ -54,6 +54,11 @@ namespace Smapiot.Billing.Controllers
                 throw new ApplicationException("Unexpected error orrured, please contact an administrator of the service");
             }
 
+            if (report == null)
+            {
+                return NotFound("There were no related service request in the given month");
+            }
+
             return Ok(report);
         }
     }
