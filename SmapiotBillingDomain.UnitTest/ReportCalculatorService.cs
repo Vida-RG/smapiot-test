@@ -243,7 +243,11 @@ namespace SmapiotBillingDomain.UnitTest
                         {
                             Requests1 = new List<Request>()
                             {
-                                new Request() { SubscriptionId = specificId }
+                                new Request()
+                                {
+                                    SubscriptionId = specificId,
+                                    Requested = DateTime.Now.ToString()
+                                }
                             }
                         }));
 
@@ -252,6 +256,52 @@ namespace SmapiotBillingDomain.UnitTest
             MonthlyReport result = service.CalculateReport(specificId, DateTime.Now.Year, DateTime.Now.Month).Result;
 
             Assert.AreNotEqual(result.EstimatedForRemaining, null);
+        }
+
+        [TestMethod]
+        public void MultiplierForAllMonth_TheTenthDayOfAThirtyDayMonth_ReturnsThree()
+        {
+            var reportServiceMock = new Mock<IRequestCounterService>();
+            var service = new ReportCalculatorService(reportServiceMock.Object);
+
+            double result = service.MultiplierForAllMonth(
+                new List<DateTime>
+                {
+                    new DateTime(1, 4, 10)
+                });
+
+            Assert.IsTrue(result == 3.0d);
+        }
+
+        [TestMethod]
+        public void MultiplierForAllMonth_GivenNullAsDatum_ReturnsThree()
+        {
+            var reportServiceMock = new Mock<IRequestCounterService>();
+            var service = new ReportCalculatorService(reportServiceMock.Object);
+
+            bool thrown = false;
+            try
+            {
+                double result = service.MultiplierForAllMonth(null);
+            }
+            catch (ArgumentNullException)
+            {
+                thrown = true;
+            }
+
+            Assert.IsTrue(thrown);
+        }
+
+        [TestMethod]
+        public void LastDateOfMonth_ReturnsTheDate()
+        {
+            var reportServiceMock = new Mock<IRequestCounterService>();
+
+            var service = new ReportCalculatorService(reportServiceMock.Object);
+
+            DateTime result = service.LastDateOfMonth(new DateTime(1, 1, 1));
+
+            Assert.IsTrue(result.CompareTo(new DateTime(1, 1, 31)) == 0);
         }
     }
 }

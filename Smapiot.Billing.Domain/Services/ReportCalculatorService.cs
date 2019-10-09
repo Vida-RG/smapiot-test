@@ -41,31 +41,31 @@ namespace Smapiot.Billing.Domain.Services
                 if (DateTime.Now.Year == year && DateTime.Now.Month == month)
                 {
                     estimatesForTheRestOfTheMonth =
-                        calculatedCosts.Select(costPerService =>
-                        {
-                            double multiplier = 
-                                MultiplierForAllMonth(requestsForSubscription.Select(request => DateTime.Parse(request.Duration)));
-
-                            return new CostPerService()
+                        calculatedCosts
+                            .Select(costPerService =>
                             {
-                                ServiceName = costPerService.ServiceName,
-                                NumberOfRequests = (int)Math.Ceiling(costPerService.NumberOfRequests * multiplier),
-                                TotalPrice = (int)Math.Ceiling(costPerService.TotalPrice * (decimal)multiplier)
-                            };
-                        });
+                                double multiplier = 
+                                    MultiplierForAllMonth(requestsForSubscription.Select(request => DateTime.Parse(request.Requested)));
+
+                                return new CostPerService()
+                                {
+                                    ServiceName = costPerService.ServiceName,
+                                    NumberOfRequests = (int)Math.Ceiling(costPerService.NumberOfRequests * multiplier),
+                                    TotalPrice = (int)Math.Ceiling(costPerService.TotalPrice * (decimal)multiplier)
+                                };
+                            })
+                            .ToArray();
                 }
+
+                var startDate = new DateTime(year, month, 1);
 
                 result =
                     new MonthlyReport()
                     {
                         TotalNumberOfRequests = requestsForSubscription.Count(),
                         SubscriptionId = requestsForSubscription.First().SubscriptionId,
-                        StartDate = new DateTime(year, month, 1),
-                        EndDate =
-                            new DateTime(
-                                year,
-                                month,
-                                DateTime.DaysInMonth(year, month)),
+                        StartDate =startDate,
+                        EndDate = LastDateOfMonth(startDate),
                         Costs = calculatedCosts,
                         EstimatedForRemaining = estimatesForTheRestOfTheMonth
                     };
@@ -120,9 +120,26 @@ namespace Smapiot.Billing.Domain.Services
             return (decimal)(1d + random.NextDouble());
         }
 
-        public double MultiplierForAllMonth(IEnumerable<DateTime> requestDatum)
+        public double MultiplierForAllMonth(IEnumerable<DateTime> datum)
         {
-            return 1.5;
+            if (datum == null)
+            {
+                throw new ArgumentNullException(nameof(datum));
+            }
+
+            DateTime lastDate = datum.Max();
+            DateTime lastDayfMonth = LastDateOfMonth(lastDate);
+
+            return lastDayfMonth.Day / (double)lastDate.Day;
         }
+
+        public DateTime LastDateOfMonth(DateTime date)
+        {
+            return new DateTime(
+                date.Year,
+                date.Month,
+                DateTime.DaysInMonth(date.Year, date.Month));
+        }
+
     }
 }
