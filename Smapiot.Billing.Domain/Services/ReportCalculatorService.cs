@@ -70,11 +70,36 @@ namespace Smapiot.Billing.Domain.Services
 
         public IEnumerable<CostPerService> CalculateCostPerServices(IEnumerable<Request> requests)
         {
-            var groupsPerService =
-                requests
-                    .GroupBy(request => request.ServiceName);
+            if (requests == null)
+            {
+                throw new ArgumentNullException(nameof(requests));
+            }
 
-            return new List<CostPerService>();
+            var result =
+                requests
+                    .GroupBy(request => request.ServiceName)
+                    .Select(group =>
+                    {
+                        string serviceName = group.First().ServiceName;
+                        decimal pricing = GetPricingForService(serviceName);
+                        int countOfCalls = group.Count();
+
+                        return new CostPerService()
+                        {
+                            ServiceName = serviceName,
+                            TotalPrice = pricing * countOfCalls,
+                            NumberOfRequests = countOfCalls
+                        };
+                    });
+
+            return result;
+        }
+
+        public decimal GetPricingForService(string serviceName)
+        {
+            Random random = new Random();
+
+            return (decimal)(1d + random.NextDouble());
         }
     }
 }

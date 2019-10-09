@@ -28,20 +28,18 @@ namespace SmapiotBillingDomain.UnitTest
         public void RequestsOfSubscription_ForSpecificId_GetOne()
         {
             const string specificId = "BBCED7DB-6972-46D4-B6CF-D2C733E4B23D";
-
             var reportServiceMock = new Mock<IRequestCounterService>();
-
             var service = new ReportCalculatorService(reportServiceMock.Object);
 
             var result = service.RequestsOfSubscription(
-                specificId, 
+                specificId,
                 new Requests()
                 {
                     Requests1 = new List<Request>()
-                        {
-                            new Request() { SubscriptionId = Guid.Empty.ToString() },
-                            new Request() { SubscriptionId = specificId }
-                        }
+                    {
+                        new Request() { SubscriptionId = Guid.Empty.ToString() },
+                        new Request() { SubscriptionId = specificId }
+                    }
                 });
 
             Assert.AreEqual(result.Count(), 1);
@@ -51,9 +49,7 @@ namespace SmapiotBillingDomain.UnitTest
         public void RequestsOfSubscription_ForSpecificId_GetOneWithSubscriptionId()
         {
             const string specificId = "BBCED7DB-6972-46D4-B6CF-D2C733E4B23D";
-
             var reportServiceMock = new Mock<IRequestCounterService>();
-
             var service = new ReportCalculatorService(reportServiceMock.Object);
 
             var result = service.RequestsOfSubscription(
@@ -61,22 +57,85 @@ namespace SmapiotBillingDomain.UnitTest
                 new Requests()
                 {
                     Requests1 = new List<Request>()
-                        {
-                            new Request() { SubscriptionId = Guid.Empty.ToString() },
-                            new Request() { SubscriptionId = specificId }
-                        }
+                    {
+                        new Request() { SubscriptionId = Guid.Empty.ToString() },
+                        new Request() { SubscriptionId = specificId }
+                    }
                 });
 
             Assert.AreEqual(result.First().SubscriptionId, specificId);
         }
 
         [TestMethod]
+        public void CalculateCostPerServices_NullParameter_ThrowsArgumentNullException()
+        {
+            const string specificId = "BBCED7DB-6972-46D4-B6CF-D2C733E4B23D";
+            var reportServiceMock = new Mock<IRequestCounterService>();
+            var service = new ReportCalculatorService(reportServiceMock.Object);
+
+            bool thrown = false;
+            try
+            {
+                var result = service.CalculateCostPerServices(null);
+            }
+            catch (ArgumentNullException)
+            {
+                thrown = true;
+            }
+
+            Assert.IsTrue(thrown);
+        }
+
+        [TestMethod]
+        public void CalculateCostPerServices_OnAList_ShouldReturnACollectionOfPrices()
+        {
+            var reportServiceMock = new Mock<IRequestCounterService>();
+            var service = new ReportCalculatorService(reportServiceMock.Object);
+
+            var result = service.CalculateCostPerServices(new List<Request>());
+
+            Assert.AreNotEqual(result, null);
+        }
+
+        [TestMethod]
+        public void CalculateCostPerServices_OnAListOfWithOneItem_GivesBackAFilledInCostForThatService()
+        {
+            const string serviceName = "asd";
+            var reportServiceMock = new Mock<IRequestCounterService>();
+            var service = new ReportCalculatorService(reportServiceMock.Object);
+
+            var results = service.CalculateCostPerServices(
+                new List<Request>()
+                {
+                    new Request()
+                    {
+                        ServiceName = serviceName,
+                    }
+                });
+
+            CostPerService result = results.First();
+
+            Assert.AreEqual(result.ServiceName, serviceName);
+            Assert.AreEqual(result.NumberOfRequests, 1);
+            Assert.IsTrue(result.TotalPrice > 0);
+        }
+
+        [TestMethod]
+        public void GetPricingForService_OnAnyServiceName_ReturnsAPositivePrice()
+        {
+            var reportServiceMock = new Mock<IRequestCounterService>();
+            var service = new ReportCalculatorService(reportServiceMock.Object);
+
+            decimal randomPrice = service.GetPricingForService(null);
+
+            Assert.IsTrue(randomPrice > 0);
+        }
+
+        [TestMethod]
         public void CalculateReport_RequestsNull_ThrowsArgumentNullException()
         {
             const string specificId = "BBCED7DB-6972-46D4-B6CF-D2C733E4B23D";
-
             var reportServiceMock = new Mock<IRequestCounterService>();
-
             var service = new ReportCalculatorService(reportServiceMock.Object);
 
             bool thrown = false;
@@ -98,7 +157,6 @@ namespace SmapiotBillingDomain.UnitTest
         public void CalculateReport_NoRequestFound_ReturnsNull()
         {
             const string specificId = "BBCED7DB-6972-46D4-B6CF-D2C733E4B23D";
-
             var reportServiceMock = new Mock<IRequestCounterService>();
             reportServiceMock
                 .Setup(moq =>
@@ -145,7 +203,6 @@ namespace SmapiotBillingDomain.UnitTest
         public void CalculateReport_AtleastOneRequestFound_ReturnsAReportFilledIn()
         {
             const string specificId = "BBCED7DB-6972-46D4-B6CF-D2C733E4B23D";
-
             var reportServiceMock = new Mock<IRequestCounterService>();
             reportServiceMock
                 .Setup(moq =>
@@ -155,9 +212,9 @@ namespace SmapiotBillingDomain.UnitTest
                         new Requests()
                         {
                             Requests1 = new List<Request>()
-                        {
-                            new Request() { SubscriptionId = specificId }
-                        }
+                            {
+                                new Request() { SubscriptionId = specificId }
+                            }
                         }));
 
             var service = new ReportCalculatorService(reportServiceMock.Object);
@@ -171,5 +228,7 @@ namespace SmapiotBillingDomain.UnitTest
             Assert.AreNotEqual(result.Costs, null);
             Assert.AreEqual(result.EstimatedForRemaining, null);
         }
+
+
     }
 }
