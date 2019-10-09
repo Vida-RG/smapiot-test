@@ -33,9 +33,27 @@ namespace Smapiot.Billing.Domain.Services
             MonthlyReport result = null;
             if (requestsForSubscription.Any())
             {
-                var calculatedCosts = CalculateCostPerServices(requestsForSubscription);
+                IEnumerable<CostPerService> calculatedCosts = 
+                    CalculateCostPerServices(requestsForSubscription)
+                    .ToArray();
 
+                IEnumerable<CostPerService> estimatesForTheRestOfTheMonth = null;
+                if (DateTime.Now.Year == year && DateTime.Now.Month == month)
+                {
+                    estimatesForTheRestOfTheMonth =
+                        calculatedCosts.Select(costPerService =>
+                        {
+                            double multiplier = 
+                                MultiplierForAllMonth(requestsForSubscription.Select(request => DateTime.Parse(request.Duration)));
 
+                            return new CostPerService()
+                            {
+                                ServiceName = costPerService.ServiceName,
+                                NumberOfRequests = (int)Math.Ceiling(costPerService.NumberOfRequests * multiplier),
+                                TotalPrice = (int)Math.Ceiling(costPerService.TotalPrice * (decimal)multiplier)
+                            };
+                        });
+                }
 
                 result =
                     new MonthlyReport()
@@ -49,7 +67,7 @@ namespace Smapiot.Billing.Domain.Services
                                 month,
                                 DateTime.DaysInMonth(year, month)),
                         Costs = calculatedCosts,
-                        EstimatedForRemaining = null
+                        EstimatedForRemaining = estimatesForTheRestOfTheMonth
                     };
             }
 
@@ -100,6 +118,11 @@ namespace Smapiot.Billing.Domain.Services
             Random random = new Random();
 
             return (decimal)(1d + random.NextDouble());
+        }
+
+        public double MultiplierForAllMonth(IEnumerable<DateTime> requestDatum)
+        {
+            return 1.5;
         }
     }
 }

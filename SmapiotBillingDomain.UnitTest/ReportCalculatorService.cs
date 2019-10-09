@@ -229,6 +229,29 @@ namespace SmapiotBillingDomain.UnitTest
             Assert.AreEqual(result.EstimatedForRemaining, null);
         }
 
+        [TestMethod]
+        public void CalculateReport_AtleastOneRequestFound_And_ActualMonth_ReturnsAReportFilledInWithEstimates()
+        {
+            const string specificId = "BBCED7DB-6972-46D4-B6CF-D2C733E4B23D";
+            var reportServiceMock = new Mock<IRequestCounterService>();
+            reportServiceMock
+                .Setup(moq =>
+                    moq._api_requests_year_month_getAsync(It.IsAny<int>(), It.IsAny<int>()))
+                .Returns(
+                    Task.FromResult<Requests>(
+                        new Requests()
+                        {
+                            Requests1 = new List<Request>()
+                            {
+                                new Request() { SubscriptionId = specificId }
+                            }
+                        }));
 
+            var service = new ReportCalculatorService(reportServiceMock.Object);
+
+            MonthlyReport result = service.CalculateReport(specificId, DateTime.Now.Year, DateTime.Now.Month).Result;
+
+            Assert.AreNotEqual(result.EstimatedForRemaining, null);
+        }
     }
 }
