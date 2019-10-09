@@ -26,19 +26,41 @@ namespace Smapiot.Billing.Domain.Services
 
             var allRequests = await _requestCounterService._api_requests_year_month_getAsync(year, month);
 
-            var requestsForSubscription = RequestsOfSubscription(subscriptionId, allRequests);
+            var requestsForSubscription = 
+                RequestsOfSubscription(subscriptionId, allRequests)
+                .ToArray();
 
+            MonthlyReport result = null;
+            if (requestsForSubscription.Any())
+            {
+                result =
+                    new MonthlyReport()
+                    {
+                    };
+            }
 
-
-
-            throw new NotImplementedException();
+            return result;
         }
 
         public IEnumerable<Request> RequestsOfSubscription(string subscriptionId, Requests allRequests)
         {
+            if (allRequests == null)
+            {
+                throw new ArgumentNullException(nameof(allRequests));
+            }
+
             return allRequests.Requests1
                 .Where(request => request.Id == subscriptionId)
                 .ToArray();
+        }
+
+        public IEnumerable<CostPerService> CalculateCostPerServices(IEnumerable<Request> requests)
+        {
+            var groupsPerService =
+                requests
+                    .GroupBy(request => request.ServiceName);
+
+            return null;
         }
     }
 }
